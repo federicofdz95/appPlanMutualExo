@@ -7,18 +7,18 @@ import { useForm } from "react-hook-form";
 import { useNavigation } from '@react-navigation/native';
 import axios from "axios";
 import { ToastAndroid } from "react-native";
-const ulrControlDni = "http://localhost:84/api/control/";
-const ulrHisAfil = "http://localhost:84/api/hisafil/";
-const ulrEmpresaOpcion = "http://localhost:84/api/empresaopcion/";
+import { json } from "react-router-dom";
+
+const urlControlDni = "http://apiphp.federicofdz.com/api/afiliados/";
+const urlHisAfil = "http://apiphp.federicofdz.com/api/hisafil/";
+const urlEmpresaOpcion = "http://apiphp.federicofdz.com/api/empresaopcion/";
 
 
 
-const LoginScreen = () => {
+const LoginScreen = ({navigation}) => {
 
-  const [dni, setDni] = useState("");
-
-  const { dataApi, isLoading } = DataApi("http://localhost:84/api/deudores");  
-  const [dniOk, setDniOk] = useState("");
+  const [dni, setDni] = useState(null);
+  const { dataApi, isLoading } = DataApi("http://apiphp.federicofdz.com/api/deudores");    
   const navigate = useNavigation();
 
   const { register, handleSubmit } = useForm({
@@ -31,42 +31,83 @@ const LoginScreen = () => {
   };
 
   const showToast = () => {
-    ToastAndroid.show(dni, ToastAndroid.SHORT);
+    //ToastAndroid.show(dni, ToastAndroid.SHORT);
+    //buscarAfi(dni);
+    prueba(dni);
+  };
+
+
+  const prueba = async (dni) => {
+
+    if (dni===null || dni==='') { 
+      ToastAndroid.showWithGravity(
+        'Ingrese DNI',
+        ToastAndroid.SHORT,
+        ToastAndroid.CENTER,
+      );
+      return;
+    }     
+
+    try {
+      const response = await axios.get(
+        urlControlDni + dni
+        ,{
+          headers: {
+            'Content-Type': 'application/json;charset=UTF-8',
+            "Access-Control-Allow-Origin": "*",
+          }
+         })
+         .then((response) => {
+          if (response.data.count === 0) {            
+            ToastAndroid.show("Afiliado inexistente", ToastAndroid.SHORT);
+          } else {            
+
+            let dni = response.data.data[0].dni;
+            let apellido = response.data.data[0].apellido;
+            let nombre = response.data.data[0].nombre;
+            //let afil = JSON.stringify(response.data.data[0])
+            //ToastAndroid.show('Bienvenido/a ' + nombre, ToastAndroid.SHORT);            
+            navigation.navigate('control', {dni: dni})
+            //navigate("/afiliado/" + datos);
+            
+          }
+         });
+      
+         
+
+    } catch (error) {
+      ToastAndroid.show("Ha ocurrido un error: " + error, ToastAndroid.SHORT);
+    }
   };
 
   const buscarAfi = (dni) => {
     if (dni !== "") {
       axios
-        .get(ulrControlDni + dni)
+        .get(urlControlDni + dni)
         .then((response) => {
-          if (response.data.length === 0) {
-            toast.error("No existe afiliado con ese DNI", { duration: 2000 });            
+          if (response.data.length === 0) {            
+            ToastAndroid.show("Afiliado inexistente", ToastAndroid.SHORT);
           } else {
-            //console.log(response.data[0]);
-            const nombre = response.data[0].afi_Nombre;
-            const apellido = response.data[0].afi_Apellido;
+            console.log("res: " + response.data[0]);
+            const nombre = response.data[0].nombre;
+            const apellido = response.data[0].apellido;
             axios
-              .get(ulrHisAfil + dni)
+              .get(urlHisAfil + dni)
               .then((response) => {
                 if (response.data.length === 0) {
-                  toast.error("No hay registros en his_afil_os", {
-                    duration: 2000,
-                  });                  
+                  ToastAndroid.show("No hay registros en his_afil_os", ToastAndroid.SHORT);                  
                 } else {
                   axios
-                    .get(ulrEmpresaOpcion + dni)
+                    .get(urlEmpresaOpcion + dni)
                     .then((response) => {
                       if (response.data.length === 0) {
-                        toast.error(
-                          "No hay registros en Empresa Opcion para " +
-                            nombre +
-                            " " +
-                            apellido,
-                          {
-                            duration: 2000,
-                          }
-                        );                        
+                        
+                        ToastAndroid.show("No hay registros en Empresa Opcion para " +
+                        nombre +
+                        " " +
+                        apellido, ToastAndroid.SHORT);                        
                       } else {
+                        ToastAndroid.show("Afiliado correcto", ToastAndroid.SHORT);
                         toast.success("Afiliado correcto", { duration: 2000 });
                         //window.location.href = "/afiliado/" + response.data[0].afi_nro_doc;
                         console.log('ok -> ' + response.data[0].afi_nro_doc);                        
@@ -74,37 +115,26 @@ const LoginScreen = () => {
                       }
                     })
                     .catch((e) => {
-                      toast.error("Ha ocurrido un error", { duration: 2000 });
+                      ToastAndroid.show("Ha ocurrido un error1", ToastAndroid.SHORT);                      
                     });
                 }
               })
               .catch((e) => {
-                toast.error("Ha ocurrido un error", { duration: 2000 });
+                ToastAndroid.show("Ha ocurrido un error2", ToastAndroid.SHORT);
               });
           }
         })
-        .catch((e) => {
-          toast.error("Ha ocurrido un error", {
-            duration: 2000,
-            position: "top-center",
-          });
+        .catch((e) => {          
+          //ToastAndroid.show("Ha ocurrido un error3", ToastAndroid.SHORT);
+          ToastAndroid.show(e, ToastAndroid.SHORT);
+          
         });
     } else {
-      toast.error("Por favor ingrese el DNI", {
-        duration: 800,
-        position: "top-center",
-      });      
+      ToastAndroid.show("Ha ocurrido un error4", ToastAndroid.SHORT);
     }   
 
   };
 
-  if (dni==="154x") {
-
-    const { dataApi: dataAfi, isLoading: loadFam } = DataApi(`http://localhost:84/api/planmutual/${32809511}`);
-    //console.log('dato: ' + dataAfi)
-
-  }
-  
   
 
   return (
@@ -121,7 +151,7 @@ const LoginScreen = () => {
           <Text style={styles.subTitulo}>App de la Mutual</Text>
           */}
           <TextInput
-          label='DNI'
+            label='DNI'
             style={styles.txtDni}
             value={dni}
             onChangeText={dni => setDni(dni)}
@@ -150,6 +180,7 @@ const styles = StyleSheet.create({
   },
   containerSvg: {        
     alignItems: 'center',
+    textAlign: 'center',
     justifyContent: 'flex-start',      
     marginTop: 100,
     marginBottom: 30,
@@ -172,7 +203,8 @@ const styles = StyleSheet.create({
   txtDni:{    
     width: '80%',
     marginBottom: 30,    
-    textAlign: 'center',    
+    textAlign: 'center',
+    justifyContent: 'center'
   },
   boton: {
     width: '80%',

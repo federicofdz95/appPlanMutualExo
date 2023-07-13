@@ -1,4 +1,6 @@
 import * as React from "react"
+import { View } from "react-native";
+import { StyleSheet } from "react-native";
 import Svg, {
   Mask,
   Path,
@@ -14,8 +16,9 @@ import Svg, {
 
 
 const LoginSVG = () => (
-
-  <Svg
+  <View style={styles.containerSvg}>
+  
+    <Svg
   xmlns="http://www.w3.org/2000/svg"
   xmlnsXlink="http://www.w3.org/1999/xlink"
   width={300}
@@ -39,7 +42,22 @@ const LoginSVG = () => (
       height={220}
     />
   </Defs>
-</Svg>
+    </Svg>
+
+  </View>
     
 )
+
+const styles = StyleSheet.create({
+    
+  containerSvg: {        
+    alignItems: 'center',
+    textAlign: 'center',
+    justifyContent: 'flex-start',      
+    marginTop: 100,
+    marginBottom: 30,
+    height: 150
+  },  
+});
+
 export default LoginSVG
