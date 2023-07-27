@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Image, StyleSheet, Text,View } from "react-native";
+import { Alert, Image, StyleSheet, Text,View } from "react-native";
 import LoginSVG from "./LoginSVG";
 import { Button, TextInput } from "react-native-paper";
 import DataApi from "./data/DataApi";
@@ -33,11 +33,11 @@ const LoginScreen = ({navigation}) => {
   const showToast = () => {
     //ToastAndroid.show(dni, ToastAndroid.SHORT);
     //buscarAfi(dni);
-    prueba(dni);
+    buscarAfi(dni);
   };
 
 
-  const prueba = async (dni) => {
+  const buscarAfi = async (dni) => {
 
     if (dni===null || dni==='') { 
       ToastAndroid.showWithGravity(
@@ -66,10 +66,10 @@ const LoginScreen = ({navigation}) => {
             let apellido = response.data.data[0].apellido;
             let nombre = response.data.data[0].nombre;
             //let afil = JSON.stringify(response.data.data[0])
-            //ToastAndroid.show('Bienvenido/a ' + nombre, ToastAndroid.SHORT);            
-            navigation.navigate('control', {dni: dni})
+            ToastAndroid.show('Hola ' + nombre, ToastAndroid.SHORT);                        
+            navigation.navigate('control', {dni: dni, apellido: apellido, nombre: nombre})
             //navigate("/afiliado/" + datos);
-            
+            return true;
           }
          });
       
@@ -80,7 +80,7 @@ const LoginScreen = ({navigation}) => {
     }
   };
 
-  const buscarAfi = (dni) => {
+  const buscarAfi_SinUso = (dni) => {
     if (dni !== "") {
       axios
         .get(urlControlDni + dni)
@@ -110,7 +110,7 @@ const LoginScreen = ({navigation}) => {
                         ToastAndroid.show("Afiliado correcto", ToastAndroid.SHORT);
                         toast.success("Afiliado correcto", { duration: 2000 });
                         //window.location.href = "/afiliado/" + response.data[0].afi_nro_doc;
-                        console.log('ok -> ' + response.data[0].afi_nro_doc);                        
+                        //console.log('ok -> ' + response.data[0].afi_nro_doc);                        
                         navigate("/afiliado/" + response.data[0].afi_nro_doc);
                       }
                     })
@@ -140,9 +140,9 @@ const LoginScreen = ({navigation}) => {
   return (
     <View style={styles.mainContainer}>
       
-      <View style={styles.containerSvg}>
-        <LoginSVG />
-      </View>
+      
+      <LoginSVG />
+      
       
       <View style={styles.container}>
         
@@ -155,6 +155,8 @@ const LoginScreen = ({navigation}) => {
             style={styles.txtDni}
             value={dni}
             onChangeText={dni => setDni(dni)}
+            maxLength={8}
+            keyboardType="numeric"
           />
 
           <Button 

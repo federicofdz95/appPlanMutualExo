@@ -3,152 +3,166 @@ import { ToastAndroid, View } from 'react-native'
 import { StyleSheet } from 'react-native'
 import { Button } from 'react-native'
 import { Text } from 'react-native'
-import { DataTable } from 'react-native-paper'
+import { Appbar, DataTable } from 'react-native-paper'
 import { FlatList } from 'react-native'
 import axios from 'axios'
 import LoginSVG from '../LoginSVG'
+import { vw, vh, vmin, vmax } from 'react-native-expo-viewport-units';
+import { SafeAreaView } from 'react-native'
+import { ScrollView } from 'react-native'
+import TopBar from './TopBar'
+import { Row, Rows, Table } from 'react-native-table-component'
+import Loading from '../Loading'
+
 
 const Afiliado = ({route}) => {
 
     const documento = (route.params.dni);
+    const afiliado = (route.params.nombre + ' ' + route.params.apellido);
+
     const [isLoading, setLoading] = useState(false);
-    const [users, setUsers] = useState([]);
+    const [data, setData] = useState([]);
+    
     const [nombre, setNombre] = useState('');
     const [apellido, setApellido] = useState('');
 
+
     const urlControlDni = "http://apiphp.federicofdz.com/api/afiliados/";
 
-    getUsers = async () => {
-        try {
-            const response = await axios.get(
-              urlControlDni + documento
-              ,{
-                headers: {
-                  'Content-Type': 'application/json;charset=UTF-8',
-                  "Access-Control-Allow-Origin": "*",
-                }
-               })
-               .then((response) => {
-                if (response.data.count === 0) {            
-                  ToastAndroid.show("Afiliado inexistente", ToastAndroid.SHORT);
-                } else {            
-      
-                  const dni = response.data.data[0].dni;
-                  setApellido(response.data.data[0].apellido);
-                  setNombre(response.data.data[0].nombre);
-                  //ToastAndroid.show('OK', ToastAndroid.SHORT);
-                  setLoading(false);
-                  
-                }
-               });
-            
-               
-      
-          } catch (error) {
-            ToastAndroid.show("Ha ocurrido un error: " + error, ToastAndroid.SHORT);
-          }
+    getUsers = () => {
+
+      axios({
+        method: 'GET',
+        url: `${urlControlDni}${documento}`
+      })
+      .then(res => {   
+        
+        if (res.data.count === 0) {            
+          ToastAndroid.show("Afiliado inexistente", ToastAndroid.SHORT);
+        } else {            
+                    
+          const dni = res.data.data[0].dni;
+          setApellido(res.data.data[0].apellido);
+          setNombre(res.data.data[0].nombre);          
+          setData((res.data.data));
+          //setCount(res.data.count);
+          setLoading(true);          
+          //console.log(JSON.stringify(res.data.data))
+          
+        }        
+      })
+      .catch(err => ToastAndroid.show("Ha ocurrido un error: " + err, ToastAndroid.SHORT));
+
     }
 
-    useEffect(() => {
-        setLoading(true);
+    useEffect(() => {        
         getUsers();
     }, []);
 
+    
+
   return (
-    <View style={styles.mainContainer}>
 
+    <>
+
+    <TopBar data={afiliado} />
+    
+
+    <SafeAreaView style={styles.mainContainer}>
         
-        <LoginSVG />        
+        <View style={styles.mainContainer}>
 
+          {!isLoading ? 
+              (              
+                <Loading/>
+              ):(
 
-        {isLoading ? <Text>Cargando...</Text> :
-            (
-                <Text>                  
+              <>
 
-                    <DataTable style={styles.container}>
+                <ScrollView style={styles.scrollView}>
 
-                        <DataTable.Header style={styles.tableHeader}>
+                    <Text style={{
+                      textAlign:'center',
+                      marginTop: 10,
+                    }}>HISTORIAL</Text>
+                    <DataTable style={styles.table}>                        
+                        <DataTable.Header style={styles.tableHeader}>                            
                             <DataTable.Title>DNI</DataTable.Title>
-                            <DataTable.Title>NOMBRE</DataTable.Title>
-                            <DataTable.Title>APELLIDO</DataTable.Title>
+                            <DataTable.Title>PLAN</DataTable.Title>
+                            <DataTable.Title>DESDE</DataTable.Title>
+                            <DataTable.Title>HASTA</DataTable.Title>
                         </DataTable.Header>
 
-                        <DataTable.Row style={styles.tableRow}>
-                            <DataTable.Cell>{documento}</DataTable.Cell>
-                            <DataTable.Cell>{nombre}</DataTable.Cell>
-                            <DataTable.Cell>{apellido}</DataTable.Cell>
-                        </DataTable.Row>
+                        {data.map((x,i) => (
+                          <DataTable.Row key={i} style={styles.tableRow}>                              
+                              <DataTable.Cell style={styles.texto}><Text>{documento}</Text></DataTable.Cell>
+                              <DataTable.Cell style={styles.texto}><Text>{x.cod_plan}</Text></DataTable.Cell>
+                              <DataTable.Cell>{x.desde}</DataTable.Cell>
+                              {x.hasta == '' ?
+                                (
+                                  <>
+                                    <DataTable.Cell style={{
+                                      backgroundColor: '#b0f2c2',                                      
+                                    }}>
+                                      activo
+                                    </DataTable.Cell>
+                                  </>
+                                ):(
+                                  <>
+                                    <DataTable.Cell>{x.hasta}</DataTable.Cell>
+                                  </>
+                              )}
+                              
+                          </DataTable.Row>
+                        ))}
                               
                     </DataTable>
-                    
-                </Text>
-            )}
+              
+              </ScrollView>
 
-        {/*
-        <Button
-            title="Volver"
-            onPress={() =>
-                navigation.navigate('login')
-            }
-        /> 
-        */}               
+              </> 
 
-    </View>
+             )}
+
+        
+          </View>
+
+      </SafeAreaView>
+
+    </>
   )
 }
 
 
 const styles = StyleSheet.create({
   
-    mainContainer: {    
-      flex: 1,
-      backgroundColor: '#f1f1f1',
-    },
-    containerSvg: {        
-      alignItems: 'center',
-      textAlign: 'center',
-      justifyContent: 'flex-start',      
-      marginTop: 100,
-      marginBottom: 30,
-      height: 150
-    },
-    container: {    
-      alignItems: 'center',
-      justifyContent: 'center',
-      textAlign: 'center',
+  mainContainer: {    
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f1f1f1',         
+  },    
+  scrollView: {      
+    marginHorizontal: 10,      
+  },
+  container: {    
+    flex:1,
+  },     
+    table: {      
+      width: vw(100) ,
+      //height: vh(100),
+      marginTop: 20,      
     },  
-    titulo: {
-      fontSize: 80,
-      color: '#34434D',
-      fontWeight: 'bold',    
-    },
-    subTitulo: {
-      fontSize: 15,
-      color: '#000',   
-      marginBottom: 20, 
-    },
-    txtDni:{    
-      width: '80%',
-      marginBottom: 30,    
+    tableHeader: {                
       textAlign: 'center',
-      justifyContent: 'center'
+      backgroundColor: '#DCDCDC',       
     },
-    boton: {
-      width: '80%',
-      //height: '20%',    
+    tableRow: {                
+        backgroundColor: '#FFF',          
     },
-    tableHeader: {
-        width:400,
-        padding: 5,
-        backgroundColor: '#DCDCDC',
-        textAlign: 'center',
-    },
-    tableRow: {
-        width:400,
-        padding: 15,
-        backgroundColor: '#FFF',
-        textAlign: 'center',
-    },
+    texto: {
+      textAlign:'center',      
+    }
   });
 
 export default Afiliado

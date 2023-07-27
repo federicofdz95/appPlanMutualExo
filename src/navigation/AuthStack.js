@@ -3,8 +3,10 @@ import { createStackNavigator } from '@react-navigation/stack';
 import {NavigationContainer} from '@react-navigation/native';
 import LoginScreen from '../components/LoginScreen';
 import Control from '../components/Control';
+import TopBar from '../components/afiliado/TopBar';
 
 const Stack = createStackNavigator();
+//const Stack = createNativeStackNavigator();
 
 
 const AuthStack = () => {
@@ -13,6 +15,7 @@ const AuthStack = () => {
         <Stack.Navigator screenOptions={{headerShown: false}}>                  
           <Stack.Screen name="login" component={LoginScreen} />
           <Stack.Screen name="control" component={Control} />
+          <Stack.Screen name="TopBar" component={TopBar} />
         </Stack.Navigator>
       </NavigationContainer>
     );
