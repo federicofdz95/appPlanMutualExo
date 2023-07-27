@@ -85,6 +85,7 @@ const Afiliado = ({route}) => {
                       textAlign:'center',
                       marginTop: 10,
                     }}>HISTORIAL</Text>
+                    
                     <DataTable style={styles.table}>                        
                         <DataTable.Header style={styles.tableHeader}>                            
                             <DataTable.Title>DNI</DataTable.Title>

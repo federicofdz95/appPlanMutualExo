@@ -16,7 +16,7 @@ import Loading from '../Loading'
 
 
 
-const Facturaciones = ({route},{navigation}) => {
+const Facturaciones = ({route}) => {
 
     const navigate = useNavigation();    
     const documento = (route.params.dni);

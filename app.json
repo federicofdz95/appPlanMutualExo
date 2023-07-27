@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "appPlanSaludExpo",
-    "slug": "appPlanSaludExpo",
+    "slug": "appplansuperador",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -25,6 +25,12 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "d21a2a13-7f62-44d4-8845-1643d6c53332"
+      }
+    },
+    "owner": "federicofdz"
   }
 }

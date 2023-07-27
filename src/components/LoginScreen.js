@@ -67,7 +67,7 @@ const LoginScreen = ({navigation}) => {
             let nombre = response.data.data[0].nombre;
             //let afil = JSON.stringify(response.data.data[0])
             ToastAndroid.show('Hola ' + nombre, ToastAndroid.SHORT);                        
-            navigation.navigate('control', {dni: dni, apellido: apellido, nombre: nombre})
+            navigation.navigate('bottomBar', {dni: dni, apellido: apellido, nombre: nombre})
             //navigate("/afiliado/" + datos);
             return true;
           }
