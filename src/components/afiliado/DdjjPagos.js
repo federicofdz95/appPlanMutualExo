@@ -1,14 +1,17 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import TopBar from './TopBar'
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import { Platform, View } from 'react-native';
-import { StyleSheet } from 'react-native';
+import { Platform } from 'react-native';
 import { vw, vh, vmin, vmax } from 'react-native-expo-viewport-units';
 import { Text, TextInput } from 'react-native-paper';
 import { useState } from 'react';
 import { ToastAndroid } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Button } from 'react-native';
+import axios from 'axios';
+import Loading from '../Loading';
+import { View, Picker, StyleSheet } from "react-native";
+
 
 
 
@@ -27,7 +30,34 @@ const DdjjPagos = ({route}) => {
     const [date, setDate] = React.useState(new Date())
     const [mode, setMode] = React.useState('date')
     const [show, setShow] = React.useState(false)
-    const [text, setText] = React.useState('Empty')
+    const [text, setText] = React.useState('')
+    const [data, setData] = useState([]);
+    const [loading, setLoading] = useState(false);
+    
+
+    const urlPeriodosImpagos = "http://apiphp.federicofdz.com/api/deuda/";
+
+    getPeriodosImpagos = () => {
+        axios({
+          method: 'GET',
+          url: `${urlPeriodosImpagos}${documento}`
+        })
+        .then((res) => {
+          
+            setData(JSON.stringify(res.data.data));
+            setLoading(true);
+            //console.log(`${urlPeriodosImpagos}${documento}`)
+            console.log(res.data.count)
+            console.log((data))
+          
+        })
+        .catch(err => ToastAndroid.show("Ha ocurrido un error: " + err, ToastAndroid.SHORT));
+    }
+
+    useEffect(() => {        
+        getPeriodosImpagos();
+    }, []);
+
 
     const onChange = (e, selectedDate) => {
       const currentDate = selectedDate || date;
@@ -35,7 +65,12 @@ const DdjjPagos = ({route}) => {
       setDate(currentDate);
 
       let tempDate = new Date(currentDate);
-      let fDate = tempDate.getDate() + '/' + tempDate.getMonth() + '/' + tempDate.getFullYear();
+      let dia = tempDate.getDate()
+      let mes = tempDate.getMonth().length==0 ? (tempDate.getMonth()+1) : (tempDate.getMonth()+1);
+      mes = String(mes).padStart(2, '0');
+      let anio = tempDate.getFullYear()
+
+      let fDate =  `${dia}/${mes}/${anio}`;
       setText(fDate);
     }
 
@@ -43,6 +78,7 @@ const DdjjPagos = ({route}) => {
         setShow(true);
         setMode(currentMode);
     }
+    
     
 
   return (
@@ -53,76 +89,82 @@ const DdjjPagos = ({route}) => {
         <SafeAreaProvider style={styles.mainContainer}>
             <View style={styles.mainContainer}>
 
-                <Text style={{
-                    textAlign:'center',
-                    marginBottom: 30,
-                    fontSize: 18,
-                }}>DECLARACION DE PAGO
-                </Text>
-                
-                <TextInput
-                    label='DNI'
-                    style={styles.inputs}
-                    value={documento}
-                    onChangeText={dni => setDni(dni)}
-                    maxLength={8}
-                    keyboardType="numeric"
-                    disabled
-                />
+                {!loading ? (
+                  <>
+                    <Loading/>
+                  </>
+                ):(
+                  <>
+                    <Text style={{
+                        textAlign:'center',
+                        marginBottom: 30,
+                        fontSize: 18,
+                    }}>DECLARACION DE PAGO
+                    </Text>
+                    
+                    <TextInput
+                        label='DNI'
+                        style={styles.inputs}
+                        value={documento}
+                        onChangeText={dni => setDni(dni)}
+                        maxLength={8}
+                        keyboardType="numeric"
+                        disabled
+                    />
+                    
+                    
+                    {/* SELECT con opciones de periodos IMPAGOS */}
+                    
 
-                <TextInput
-                    label='PERIODO'
-                    style={styles.inputs}
-                    value={anio}                    
-                    maxLength={10}                       
-                />
-                                
 
-                <TextInput
-                    label='MONTO'
-                    style={styles.inputs}
-                    value={anio}
-                    onChangeText={dni => setDni(dni)}
-                    maxLength={8}
-                    keyboardType="numeric"
-                />                                
-                
+                    <TextInput
+                        label='MONTO'
+                        style={styles.inputs}
+                        value={anio}
+                        onChangeText={dni => setDni(dni)}
+                        maxLength={8}
+                        keyboardType="numeric"
+                    />                                
+                    
 
-                <Button
-                  title='FECHA DE PAGO'                  
-                  color={'green'}
-                  onPress={() => showMode('date')}
-                />
+                    <Button
+                      title='FECHA DE PAGO'                  
+                      color={'green'}
+                      onPress={() => showMode('date')}
+                    />
 
-                <TextInput                    
-                    style={styles.inputs}
-                    value={text}                    
-                    maxLength={11}                    
-                    disabled
-                />
+                    <TextInput                    
+                        style={styles.inputs}
+                        value={text}                    
+                        maxLength={11}                    
+                        disabled
+                    />
 
-                                  
+                                      
 
-                {show && (
-                  <DateTimePicker
-                    testID='dateTimePicker'
-                    value={date}
-                    mode={mode}
-                    display='default'
-                    onChange={onChange}
-                  />
+                    {show && (
+                      <DateTimePicker
+                        testID='dateTimePicker'
+                        value={date}
+                        mode={mode}
+                        display='default'
+                        onChange={onChange}
+                      />
+                    )}
+                    
+                    {/*
+                    <Button 
+                        icon="" 
+                        mode="contained" 
+                        style={styles.boton}
+                        buttonColor="#6eaa5e"
+                        onPress={() => chargeDdjj()}>
+                        Ingresar
+                    </Button>
+                    */}
+                  </>
                 )}
                 
-                {/*
-                <Button 
-                    icon="" 
-                    mode="contained" 
-                    style={styles.boton}
-                    buttonColor="#6eaa5e"
-                    onPress={() => chargeDdjj()}>
-                    Ingresar
-                </Button>
-                */}
 
             </View>
         </SafeAreaProvider>
@@ -145,9 +187,21 @@ const styles = StyleSheet.create({
       marginHorizontal: 10,
             
     },
-    container: {    
-      flex:1,
-    },      
+    container: {
+      flex: 1,
+      backgroundColor: "#fff",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+  
+  selectContainer: {
+      backgroundColor: "#fff",
+      borderWidth: 1,
+      borderTopWidth: 0,
+      borderLeftWidth: 0,
+      borderRightWidth: 0,
+      width: 300,
+    },
     table: {      
       width: vw(110) ,
       //height: vh(100),      

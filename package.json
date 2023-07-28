@@ -11,6 +11,7 @@
   "dependencies": {
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
+    "@expo/vector-icons": "^13.0.0",
     "@expo/webpack-config": "^18.0.1",
     "@mui/material": "^5.14.1",
     "@mui/styled-engine-sc": "^5.12.0",
@@ -26,6 +27,9 @@
     "react-hook-form": "^7.45.1",
     "react-native": "0.71.8",
     "react-native-datepicker": "^1.7.2",
+    "react-native-dropdown-picker": "^5.4.6",
+    "react-native-dropdown-select-list": "^2.0.4",
+    "react-native-element-dropdown": "^2.9.0",
     "react-native-expo-viewport-units": "^0.0.8",
     "react-native-gesture-handler": "~2.9.0",
     "react-native-paper": "^5.9.1",
@@ -39,6 +43,7 @@
     "react-native-vector-icons": "^9.2.0",
     "react-native-web": "~0.18.10",
     "react-router-dom": "^6.14.1",
+    "react-select": "^5.7.4",
     "styled-components": "^5.3.11"
   },
   "devDependencies": {

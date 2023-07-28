@@ -27,7 +27,9 @@ const Login = ({route}) => {
   const [dni, setDni] = useState(null);
   const [pass, setPass] = useState(null);
   const [userOk, setUserOk] = useState(false);
+  const [dniDisabled, setDniDisabled] = useState(false);
   const [secureTextEntry, setSecureTextEntry] = useState(true);
+  const [textoBoton, setTextoBoton] = useState('Validar');
   const { dataApi, isLoading } = DataApi("http://apiphp.federicofdz.com/api/deudores");    
     
 
@@ -42,10 +44,16 @@ const Login = ({route}) => {
 
   const showToast = () => {
     
-    if(!pass===true) {
+    
+
+    if(textoBoton==='Validar') {
       buscarAfi(dni);
     } else {
-      ingresar(dni);
+      if(!pass===true) {
+        ToastAndroid.show("Ingrese la contraseña", ToastAndroid.SHORT);        
+      } else {
+        ingresar(dni);
+      }
     }
     
   };
@@ -74,9 +82,14 @@ const Login = ({route}) => {
          .then((response) => {
           if (response.data.count === 0) {            
             ToastAndroid.show("Afiliado inexistente", ToastAndroid.SHORT);
+            setTextoBoton('Validar');
             setUserOk(false);
+            setPass(null);
+            
           } else {
             setUserOk(true);
+            //setDniDisabled(true);
+            setTextoBoton('Ingresar');
             return true;
           }
          });
@@ -111,7 +124,9 @@ const Login = ({route}) => {
          .then((response) => {
           if (response.data.count === 0) {            
             ToastAndroid.show("Afiliado inexistente", ToastAndroid.SHORT);
-            setUserOk(false);
+            setTextoBoton('Validar');
+            setPass(null);
+            setUserOk(false);            
           } else {            
 
             let dni = response.data.data[0].dni;
@@ -152,6 +167,7 @@ const Login = ({route}) => {
             onChangeText={dni => setDni(dni)}
             maxLength={8}
             keyboardType="numeric"
+            disabled={dniDisabled}
           />
 
           {userOk && (
@@ -175,7 +191,7 @@ const Login = ({route}) => {
             style={styles.boton}
             buttonColor="#6eaa5e"
             onPress={() => showToast()}>
-              Ingresar
+              {textoBoton}
           </Button>
         
       </View>
