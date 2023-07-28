@@ -1,4 +1,4 @@
-import { StackActions, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import React from 'react'
 import { StyleSheet, ToastAndroid } from 'react-native'
 import { Appbar, Text } from 'react-native-paper'
@@ -8,8 +8,9 @@ const TopBar = ({data}) => {
   const navigation = useNavigation();
 
   const salir = () => {
-    ToastAndroid.show('Hasta luego ', ToastAndroid.TOP);
-    navigation.navigate('login');    
+    ToastAndroid.show('Sesión cerrada ', ToastAndroid.TOP);
+    
+    navigation.navigate('login', {doc: ''});    
   }
   
   return (

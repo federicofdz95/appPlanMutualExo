@@ -3,17 +3,14 @@ import { Button } from 'react-native'
 import { createMaterialBottomTabNavigator } from 'react-native-paper/react-navigation';
 import Afiliado from './Afiliado'
 import Facturaciones from './Facturaciones';
-import Pagos from './Pagos';
+import DdjjPagos from './DdjjPagos';
 import { FontAwesome } from '@expo/vector-icons'; 
 import { FontAwesome5 } from '@expo/vector-icons'; 
-import DdjjPagos from './DdjjPagos';
-
-
 
 
 const Tab = createMaterialBottomTabNavigator();
 
-function BottomBar({route}) {
+const BottomBar = ({route}) => {
 
   const documento = (route.params.dni);
   const nombre = (route.params.nombre);
