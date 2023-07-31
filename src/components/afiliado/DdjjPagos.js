@@ -47,8 +47,8 @@ const DdjjPagos = ({route}) => {
             setData(JSON.stringify(res.data.data));
             setLoading(true);
             //console.log(`${urlPeriodosImpagos}${documento}`)
-            console.log(res.data.count)
-            console.log((data))
+            //console.log(res.data.count)
+            //console.log((data))
           
         })
         .catch(err => ToastAndroid.show("Ha ocurrido un error: " + err, ToastAndroid.SHORT));
@@ -82,9 +82,7 @@ const DdjjPagos = ({route}) => {
     
 
   return (
-    <>
-        
-        <TopBar data={afiliado} />
+    <>               
 
         <SafeAreaProvider style={styles.mainContainer}>
             <View style={styles.mainContainer}>

@@ -55,8 +55,7 @@ const Facturaciones = ({route}) => {
   return (
     
     <>
-      
-      <TopBar data={afiliado} />
+            
 
     <SafeAreaView style={styles.mainContainer}>
         

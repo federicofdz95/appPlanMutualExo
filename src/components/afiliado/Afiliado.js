@@ -64,8 +64,6 @@ const Afiliado = ({route}) => {
   return (
 
     <>
-
-    <TopBar data={afiliado} />
     
 
     <SafeAreaView style={styles.mainContainer}>

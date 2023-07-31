@@ -8,8 +8,7 @@ const TopBar = ({data}) => {
   const navigation = useNavigation();
 
   const salir = () => {
-    ToastAndroid.show('Sesión cerrada ', ToastAndroid.TOP);
-    
+    ToastAndroid.show('Sesión cerrada ', ToastAndroid.TOP);    
     navigation.navigate('login', {doc: ''});    
   }
   
