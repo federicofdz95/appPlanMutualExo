@@ -157,7 +157,8 @@ const styles = StyleSheet.create({
       backgroundColor: '#DCDCDC',       
     },
     tableRow: {                
-        backgroundColor: '#FFF',          
+        backgroundColor: '#FFF',         
+        height: vw(18), 
     },
     texto: {
       textAlign:'center',      

@@ -3,21 +3,33 @@ import { Button } from 'react-native'
 import { createMaterialBottomTabNavigator } from 'react-native-paper/react-navigation';
 import Afiliado from './Afiliado'
 import Facturaciones from './Facturaciones';
-import DdjjPagos from './DdjjPagos';
+import Deuda from './Deuda';
+import Pagos from './Pagos'
 import { FontAwesome } from '@expo/vector-icons'; 
 import { FontAwesome5 } from '@expo/vector-icons'; 
+import TurnosMedicos from './TurnosMedicos';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faNotesMedical } from '@fortawesome/free-solid-svg-icons/faNotesMedical'
+import { vw, vh, vmin, vmax } from 'react-native-expo-viewport-units';
 
 
 const Tab = createMaterialBottomTabNavigator();
 
-const BottomBar = ({route}) => {
+const TabNav = ({route}) => {
 
   const documento = (route.params.dni);
   const nombre = (route.params.nombre);
   const apellido = (route.params.apellido);
 
   return (
-    <Tab.Navigator>
+    
+    <Tab.Navigator
+    screenOptions={{
+      tabBarActiveTintColor: '#e91e63',
+    }}
+      
+    >
+
       <Tab.Screen 
           name="Afiliado" 
           component={Afiliado} 
@@ -43,32 +55,31 @@ const BottomBar = ({route}) => {
       />
 
       <Tab.Screen    
-          name="DDJJ Pagos"
-          component={DdjjPagos} 
+          name="Deuda"
+          component={Deuda} 
           initialParams={{dni: documento, apellido: apellido, nombre: nombre}} 
-          options={{
-            tabBarLabel: 'DDJJ Pagos',
+          options={{            
             tabBarIcon: ({ color, size }) => (
               <FontAwesome5 name="money-bill" size={24} color="black" />
             ),
           }}
       />
       {/*
-      <Tab.Screen    
-          name="Pagos"        
-          component={Pagos} 
-          initialParams={{dni: documento, apellido: apellido, nombre: nombre}} 
-          options={{
-            tabBarLabel: 'Pagos',
+      <Tab.Screen 
+          name="Turnos" 
+          component={TurnosMedicos}           
+          options={{            
             tabBarIcon: ({ color, size }) => (
-              <FontAwesome5 name="money-bill" size={24} color="black" />
-            ),
-          }}
+              <FontAwesomeIcon icon={faNotesMedical} size={20} color="black" />              
+          ),
+        }}
       />
+      
+      
       */}
       
           
     </Tab.Navigator>
   );
 }
-export default BottomBar;
+export default TabNav;

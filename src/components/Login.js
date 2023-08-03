@@ -134,7 +134,7 @@ const Login = ({route}) => {
             let nombre = response.data.data[0].nombre;            
             ToastAndroid.show('Hola ' + nombre, ToastAndroid.SHORT);                        
             //navigation.navigate('bottomBar', {dni: dni, apellido: apellido, nombre: nombre})                        
-            navigation.navigate('bottomBar', {dni: dni, apellido: apellido, nombre: nombre})                        
+            navigation.navigate('drawerNav', {dni: dni, apellido: apellido, nombre: nombre})                        
             return true;
           }
          });

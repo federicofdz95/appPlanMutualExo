@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { ScrollView, ToastAndroid, View, VirtualizedList } from 'react-native'
-import { StyleSheet } from 'react-native'
-import { Button } from 'react-native'
+import { Button, StyleSheet } from 'react-native'
 import { Text } from 'react-native'
 import { Appbar, DataTable } from 'react-native-paper'
 import { FlatList } from 'react-native'
@@ -71,11 +70,11 @@ const Facturaciones = ({route}) => {
                   <ScrollView horizontal={true}>
 
                     <DataTable style={styles.table}>
+                      
                       <DataTable.Header style={styles.tableHeader}>                          
                           <DataTable.Title>AÑO</DataTable.Title>
-                          <DataTable.Title>MES</DataTable.Title>
-                          <DataTable.Title>APAGAR</DataTable.Title>
-                          <DataTable.Title>PAGADO</DataTable.Title>
+                          <DataTable.Title>MES</DataTable.Title>                          
+                          <DataTable.Title>IMPORTE</DataTable.Title>
                           <DataTable.Title>FECHAPAGO</DataTable.Title>
                         </DataTable.Header>
 
@@ -88,10 +87,11 @@ const Facturaciones = ({route}) => {
                                   {/* PAGADO */}
                                   <DataTable.Row key={i} style={{
                                     backgroundColor: '#b0f2c2',
+                                    height: vw(18),
+                                    
                                   }}>
                                     <DataTable.Cell>{x.anio}</DataTable.Cell>
-                                    <DataTable.Cell>{x.mes}</DataTable.Cell>
-                                    <DataTable.Cell>${x.pago}</DataTable.Cell>
+                                    <DataTable.Cell>{x.mes}</DataTable.Cell>                                    
                                     <DataTable.Cell>${x.monto_pagado}</DataTable.Cell>
                                     <DataTable.Cell>{x.fecha_pago}</DataTable.Cell>
                                   </DataTable.Row>
@@ -101,12 +101,15 @@ const Facturaciones = ({route}) => {
                                   {/* NO PAGADO */}
                                   <DataTable.Row key={i} style={{
                                     backgroundColor: '#fcb7af',
+                                    height: vw(18),
+                                    
                                   }}>
                                     <DataTable.Cell>{x.anio}</DataTable.Cell>
-                                    <DataTable.Cell>{x.mes}</DataTable.Cell>
+                                    <DataTable.Cell>{x.mes}</DataTable.Cell>                                    
                                     <DataTable.Cell>${x.pago}</DataTable.Cell>
-                                    <DataTable.Cell></DataTable.Cell>
-                                    <DataTable.Cell></DataTable.Cell>
+                                    <DataTable.Cell>
+                                      -
+                                    </DataTable.Cell>
                                   </DataTable.Row>
                               </>
                             )}                            
@@ -149,8 +152,8 @@ const styles = StyleSheet.create({
     container: {    
       flex:1,
     },      
-    table: {      
-      width: vw(110) ,
+    table: {            
+      width: vw(90),
       //height: vh(100),      
     } ,  
     tableHeader: {                
@@ -160,7 +163,7 @@ const styles = StyleSheet.create({
       justifyContent: 'center',
       alignItems: 'center',
       textAlignVertical: 'center',
-      alignContent: 'center',    
+      alignContent: 'center',         
     },
     tableRow: {                
         backgroundColor: '#FFF',        

@@ -3,7 +3,6 @@ import { DrawerContentScrollView, DrawerItem, DrawerItemList, createDrawerNaviga
 import { NavigationContainer } from '@react-navigation/native';
 import Afiliado from './Afiliado'
 import Facturaciones from './Facturaciones';
-import DdjjPagos from './DdjjPagos';
 import { FontAwesome } from '@expo/vector-icons'; 
 import { FontAwesome5 } from '@expo/vector-icons'; 
 import { useNavigation } from '@react-navigation/native';
@@ -13,10 +12,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { faRightFromBracket } from '@fortawesome/free-solid-svg-icons/faRightFromBracket'
 import { faMoneyBill } from '@fortawesome/free-solid-svg-icons/faMoneyBill'
 import { faNotesMedical } from '@fortawesome/free-solid-svg-icons/faNotesMedical'
+import TabNav from './TabNav';
 
 
 
-const BottomBar = ({route}) => {
+const DrawerNav = ({route}) => {
 
   const documento = (route.params.dni);
   const nombre = (route.params.nombre);
@@ -24,11 +24,25 @@ const BottomBar = ({route}) => {
 
   return (
     <Drawer.Navigator 
-      initialRouteName="Afiliado" 
+      initialRouteName="TabNav" 
       drawerContent={(props) => <CustomDrawerContent {...props} />}
-      
+      screenOptions={{
+        drawerPosition: 'right',
+        
+      }}      
     >
         
+        <Drawer.Screen         
+          name={`${nombre} ${apellido}`}
+          component={TabNav} 
+          initialParams={{dni: documento, apellido: apellido, nombre: nombre}} 
+          options={{            
+            drawerIcon: ({ color, size }) => (
+            <FontAwesome name="user" size={20} color="black" />
+          ),
+        }}/>
+
+        {/*
         <Drawer.Screen         
           name="Afiliado" 
           component={Afiliado} 
@@ -72,11 +86,12 @@ const BottomBar = ({route}) => {
             ),
           }}
         />
+        */}
 
       </Drawer.Navigator>
   );
 }
-export default BottomBar;
+export default DrawerNav;
 
 
 
@@ -84,7 +99,7 @@ const Drawer = createDrawerNavigator();
 
 
 
-function CustomDrawerContent(route, props) {
+function CustomDrawerContent(props) {
 
   const navigation = useNavigation();
     
@@ -96,12 +111,8 @@ function CustomDrawerContent(route, props) {
 
   return (
     <DrawerContentScrollView {...props}>
-      <DrawerItem         
-        label={'nombre'}
-        onPress={() => salir()} 
-        inactiveTintColor='red' 
-        icon={() =>  <FontAwesomeIcon icon={faRightFromBracket} size={20} color="black"/> } 
-      />
+      
+      
 
       <DrawerItemList {...props} />   
 
