@@ -12,8 +12,6 @@ import Env from 'react-native-config';
 import MercadoPagoCheckout from '@blackbox-vision/react-native-mercadopago-px';
 import * as MercadoPagoService from '../mercadopago/mercadopago-service';
 
-import { CardPayment } from '@mercadopago/sdk-react';
-
 
 
 
@@ -131,7 +129,10 @@ const Deuda = ({route}) => {
                                         <DataTable.Cell>${x.pago}</DataTable.Cell>                                    
                                         <DataTable.Cell>
 
-                                            <Text style={styles.text}>Pay: {JSON.stringify(paymentResult)}</Text>
+                                            <Button
+                                              title='PAGAR'
+                                              onPress={() => {alert(x.pago)}}
+                                            />
                                         
                                         </DataTable.Cell>
                                       </DataTable.Row>
@@ -151,17 +152,7 @@ const Deuda = ({route}) => {
 
             )}
 
-            <View style={styles.container}>
-            <TouchableOpacity>
-                <CardPayment
-                  initialization={{ amount: 100 }}
-                  onSubmit={async (param) => {
-                    console.log(param);
-                  }}
-                />
-            </TouchableOpacity>
             
-            </View>
 
         </View>
 
