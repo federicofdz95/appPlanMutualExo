@@ -1,18 +1,16 @@
 import React, { useEffect, useState } from 'react'
 import { ToastAndroid, View } from 'react-native'
 import { StyleSheet } from 'react-native'
-import { Button } from 'react-native'
 import { Text } from 'react-native'
 import { Appbar, DataTable } from 'react-native-paper'
-import { FlatList } from 'react-native'
 import axios from 'axios'
-import LoginSVG from '../LoginSVG'
 import { vw, vh, vmin, vmax } from 'react-native-expo-viewport-units';
 import { SafeAreaView } from 'react-native'
 import { ScrollView } from 'react-native'
-import TopBar from './TopBar'
-import { Row, Rows, Table } from 'react-native-table-component'
 import Loading from '../Loading'
+
+
+const urlControlDni = "http://apifdz.somee.com/api/afiliados/";
 
 
 const Afiliado = ({route}) => {
@@ -22,41 +20,24 @@ const Afiliado = ({route}) => {
 
     const [isLoading, setLoading] = useState(false);
     const [data, setData] = useState([]);
-    
-    const [nombre, setNombre] = useState('');
-    const [apellido, setApellido] = useState('');
-
-
-    const urlControlDni = "http://apiphp.federicofdz.com/api/afiliados/";
-
-    getUsers = () => {
-
-      axios({
-        method: 'GET',
-        url: `${urlControlDni}${documento}`
-      })
-      .then(res => {   
         
-        if (res.data.count === 0) {            
-          ToastAndroid.show("Afiliado inexistente", ToastAndroid.SHORT);
-        } else {            
-                    
-          const dni = res.data.data[0].dni;
-          setApellido(res.data.data[0].apellido);
-          setNombre(res.data.data[0].nombre);          
-          setData((res.data.data));
-          //setCount(res.data.count);
-          setLoading(true);          
-          //console.log(JSON.stringify(res.data.data))
-          
-        }        
-      })
-      .catch(err => ToastAndroid.show("Ha ocurrido un error: " + err, ToastAndroid.SHORT));
+    
+    //console.log(urlControlDni+documento)
+    //console.log(afiliado)
 
+    getUsers = async() => {
+                  
+      const resp = await fetch(urlControlDni+documento);
+      const datos = await resp.json();
+      //console.log([datos.data])
+      setData([datos.data]);
+      setLoading(true);
+      //console.log(Array.isArray(data))
+      
     }
 
     useEffect(() => {        
-        getUsers();
+      getUsers();
     }, []);
 
     
@@ -77,6 +58,8 @@ const Afiliado = ({route}) => {
 
               <>
 
+                
+
                 <ScrollView style={styles.scrollView}>
 
                     <Text style={{
@@ -84,6 +67,8 @@ const Afiliado = ({route}) => {
                       marginTop: 10,
                     }}>HISTORIAL</Text>
                     
+                    
+
                     <DataTable style={styles.table}>                        
                         <DataTable.Header style={styles.tableHeader}>                            
                             <DataTable.Title>DNI</DataTable.Title>
@@ -92,12 +77,13 @@ const Afiliado = ({route}) => {
                             <DataTable.Title>HASTA</DataTable.Title>
                         </DataTable.Header>
 
-                        {data.map((x,i) => (
+                        {Array.isArray(data) ? data.map((x,i) => {
+                          return(
                           <DataTable.Row key={i} style={styles.tableRow}>                              
                               <DataTable.Cell style={styles.texto}><Text>{documento}</Text></DataTable.Cell>
-                              <DataTable.Cell style={styles.texto}><Text>{x.cod_plan}</Text></DataTable.Cell>
+                              <DataTable.Cell style={styles.texto}><Text>{x.codPlan}</Text></DataTable.Cell>
                               <DataTable.Cell>{x.desde}</DataTable.Cell>
-                              {x.hasta == '' ?
+                              {x.hasta == '' || x.hasta == null ?
                                 (
                                   <>
                                     <DataTable.Cell style={{
@@ -113,7 +99,8 @@ const Afiliado = ({route}) => {
                               )}
                               
                           </DataTable.Row>
-                        ))}
+                        )})
+                      : null}
                               
                     </DataTable>
               

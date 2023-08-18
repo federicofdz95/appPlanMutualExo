@@ -12,7 +12,7 @@ import { useNavigation } from '@react-navigation/native';
 import TopBar from './TopBar'
 import Loading from '../Loading'
 
-
+const urlFacturaciones = "http://apifdz.somee.com/api/facturaciones/";
 
 
 const Facturaciones = ({route}) => {
@@ -26,22 +26,23 @@ const Facturaciones = ({route}) => {
     const [count, setCount] = useState(0);
     const [data, setData] = useState([]);    
 
-    const urlFacturaciones = "http://apiphp.federicofdz.com/api/facturaciones/";
+    const token = global.tokenMutual
 
     getFacturacion = async () => {
 
-        axios({
-          method: 'GET',
-          url: `${urlFacturaciones}${documento}`
-        })
-        .then(res => {          
-          setData(res.data.data);
-          setCount(res.data.count);
-          setLoading(true);
-          //console.log(res.data.data)
-        })
-        .catch(err => console.log(err));
-        
+      console.log(urlFacturaciones+documento);
+
+      const resp = await fetch(urlFacturaciones+documento, {headers:{
+        'Content-type':'application/json',
+        "Access-Control-Allow-Origin": "*",
+        "Authentication": 'Bearer ' + token,          
+      }});
+      const datos = await resp.json();
+      console.log([datos.data])
+      setData([datos.data]);
+      setLoading(true);
+      //console.log(Array.isArray(data))     
+                
     }
 
 
@@ -78,7 +79,7 @@ const Facturaciones = ({route}) => {
                           <DataTable.Title>FECHAPAGO</DataTable.Title>
                         </DataTable.Header>
 
-                        {data.map((x,i) => (
+                        {data ? data.map((x,i) => (
                           <View key={i}>
                             
                             {x.monto_pagado > 0
@@ -114,7 +115,8 @@ const Facturaciones = ({route}) => {
                               </>
                             )}                            
                           </View>                        
-                        ))}
+                        ))
+                      : null }
 
                       </DataTable>
                     
