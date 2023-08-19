@@ -7,17 +7,16 @@ import { vw, vh, vmin, vmax } from 'react-native-expo-viewport-units';
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useNavigation } from '@react-navigation/native';
 import Loading from '../Loading';
-
 import Env from 'react-native-config';
 import MercadoPagoCheckout from '@blackbox-vision/react-native-mercadopago-px';
 import * as MercadoPagoService from '../mercadopago/mercadopago-service';
+import {API_IMPAGOS} from "@env"
+
+const urlPeriodosImpagos = "http://apifdz.somee.com/api/impagos/";
 
 
 
-
-const Deuda = ({route}) => {
-
-    
+const Deuda = ({route}) => {  
     
 
     const navigate = useNavigation();    
@@ -28,9 +27,10 @@ const Deuda = ({route}) => {
     const columnas = ["AÑO", "MES", "PAGO"]
     const [count, setCount] = useState(0);
     const [data, setData] = useState([]);    
-    const urlPeriodosImpagos = "http://apiphp.federicofdz.com/api/deuda/";
-    
+        
     const [paymentResult, setPaymentResult] = useState(null);
+
+    const token = global.tokenMutual;
 
     const startCheckout = async () => {
       try {
@@ -57,19 +57,29 @@ const Deuda = ({route}) => {
     };
 
 
-    getFacturacion = async () => {
+    getFacturacion = () => {
 
-        axios({
-          method: 'GET',
-          url: `${urlPeriodosImpagos}${documento}`
-        })
-        .then(res => {          
-          setData(res.data.data);
-          setCount(res.data.count);
-          setLoading(true);
-          //console.log(res.data.data)
-        })
-        .catch(err => console.log(err));
+
+      fetch(API_IMPAGOS+documento,{
+        method: 'GET',
+        headers:{
+          "Content-type": "application/json",
+          Authorization: `Bearer ${token}` 
+        }          
+      }).then(r=>r.json()).then(res=>{
+        if(res){          
+            //console.log(res)
+            setData(res);            
+            setCount(res.length)
+            setLoading(true);            
+            
+        }
+      }).catch(err => {
+        console.log('error!: ' + err)
+        ToastAndroid.show("Afiliado inexistente", ToastAndroid.SHORT)
+      });
+
+      
         
     }
 

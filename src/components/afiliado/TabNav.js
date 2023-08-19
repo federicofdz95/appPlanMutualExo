@@ -11,6 +11,7 @@ import TurnosMedicos from './TurnosMedicos';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faNotesMedical } from '@fortawesome/free-solid-svg-icons/faNotesMedical'
 import { vw, vh, vmin, vmax } from 'react-native-expo-viewport-units';
+import Usuarios from './Usuarios';
 
 
 const Tab = createMaterialBottomTabNavigator();
@@ -64,10 +65,11 @@ const TabNav = ({route}) => {
             ),
           }}
       />
-      {/*
+      
       <Tab.Screen 
-          name="Turnos" 
-          component={TurnosMedicos}           
+          name="Usuarios" 
+          component={Usuarios}  
+          initialParams={{dni: documento, apellido: apellido, nombre: nombre}}          
           options={{            
             tabBarIcon: ({ color, size }) => (
               <FontAwesomeIcon icon={faNotesMedical} size={20} color="black" />              
@@ -76,7 +78,7 @@ const TabNav = ({route}) => {
       />
       
       
-      */}
+      
       
           
     </Tab.Navigator>

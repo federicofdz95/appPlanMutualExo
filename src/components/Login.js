@@ -69,7 +69,7 @@ const Login = ({route}) => {
         'Content-type':'application/json',
         "Access-Control-Allow-Origin": "*",
       },
-        body: JSON.stringify(data)
+      body: JSON.stringify(data)
     }).then(r=>r.json()).then(res=>{
       if(res){          
           //console.log(res.token)
@@ -79,6 +79,8 @@ const Login = ({route}) => {
           let usuario = (res.nombre + ' ' + res.apellido).toUpperCase();
 
           global.tokenMutual = res.token;
+          //window.sessionStorage.setItem("tokenMut", res.token);
+
 
           ToastAndroid.show("Hola " + usuario, ToastAndroid.SHORT);
           navigation.navigate('drawerNav', {dni: dni, apellido: apellido, nombre: nombre});

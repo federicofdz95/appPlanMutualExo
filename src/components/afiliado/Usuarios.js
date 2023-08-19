@@ -11,10 +11,10 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { useNavigation } from '@react-navigation/native';
 import TopBar from './TopBar'
 import Loading from '../Loading'
-import {API_FACTURACIONES} from "@env"
+import {API_USUARIOS} from "@env"
 
 
-const Facturaciones = ({route}) => {
+const Usuarios = ({route}) => {
 
     const navigate = useNavigation();    
     const documento = (route.params.dni);
@@ -23,6 +23,7 @@ const Facturaciones = ({route}) => {
     const [isLoading, setLoading] = useState(false);
     const columnas = ["AÑO", "MES", "PAGO"]
     const [count, setCount] = useState(0);
+    const [status, setStatus] = useState(0);
     const [data, setData] = useState([]);    
 
     const token = global.tokenMutual
@@ -30,28 +31,34 @@ const Facturaciones = ({route}) => {
     getFacturacion = async () => {
                  
       
-      fetch(API_FACTURACIONES+documento,{
-        method: 'GET',
-        headers:{
-          "Content-type": "application/json",
-          Authorization: `Bearer ${token}` 
-        }          
-      }).then(r=>r.json()).then(res=>{
-        if(res){          
-            //console.log(res)
-            setData(res);
-            //console.log(data)
-            setLoading(true);
-            //let dni = (res.dni).toUpperCase();          
-            
-        }
-      }).catch(err => {
-        console.log('error!: ' + err)
-        ToastAndroid.show("Afiliado inexistente", ToastAndroid.SHORT)
-      });
+      try {
+        const response = await fetch(API_USUARIOS,{
+          method: 'GET',
+          headers:{
+            "Content-type": "application/json",
+            Authorization: `Bearer ${token}` 
+          }          
+        });
+    
+        //console.log('status code: ', response.status); // 👉️ 200
 
-           
-      //console.log(Array.isArray(data))     
+        if (response.status == 200) {
+          const result = await response.json();
+          setStatus(200)
+          setLoading(true)
+          setData(result)
+          console.log(result)                  
+        } else {
+          console.log('No tiene los permisos suficientes')
+          setLoading(true)
+          //console.log(response);
+          //throw new Error(`Error! status: ${response.status}`);          
+        }        
+
+      } catch (err) {
+        console.log(err);
+      }
+      
                 
     }
 
@@ -82,32 +89,16 @@ const Facturaciones = ({route}) => {
 
                     <DataTable style={styles.table}>
                       
-                      <DataTable.Header style={styles.tableHeader}>                          
-                          <DataTable.Title>AÑO</DataTable.Title>
-                          <DataTable.Title>MES</DataTable.Title>                          
-                          <DataTable.Title>IMPORTE</DataTable.Title>
-                          <DataTable.Title>FECHAPAGO</DataTable.Title>
+                      {status == 200 && 
+                      <DataTable.Header style={styles.tableHeader}>
+                          <DataTable.Title>DNI</DataTable.Title>
+                          <DataTable.Title>USUARIO</DataTable.Title>                          
+                          <DataTable.Title>CREADO</DataTable.Title>                          
                         </DataTable.Header>
+                      }
 
-                        {data ? data.map((x,i) => (
-                          <View key={i}>
-                            
-                            {x.montoPagado > 0
-                            ? (
-                              <>
-                                  {/* PAGADO */}
-                                  <DataTable.Row key={i} style={{
-                                    backgroundColor: '#b0f2c2',
-                                    height: vw(18),
-                                    
-                                  }}>
-                                    <DataTable.Cell>{x.anio}</DataTable.Cell>
-                                    <DataTable.Cell>{x.mes}</DataTable.Cell>                                    
-                                    <DataTable.Cell>${x.monto_pagado}</DataTable.Cell>
-                                    <DataTable.Cell>{x.fechaPago}</DataTable.Cell>
-                                  </DataTable.Row>
-                              </>
-                            ):(                              
+                        {status==200 ? data.map((x,i) => (
+                          <View key={i}>                                                  
                               <>
                                   {/* NO PAGADO */}
                                   <DataTable.Row key={i} style={{
@@ -115,25 +106,25 @@ const Facturaciones = ({route}) => {
                                     height: vw(18),
                                     
                                   }}>
-                                    <DataTable.Cell>{x.anio}</DataTable.Cell>
-                                    <DataTable.Cell>{x.mes}</DataTable.Cell>                                    
-                                    <DataTable.Cell>${x.pago}</DataTable.Cell>
-                                    <DataTable.Cell>
-                                      -
-                                    </DataTable.Cell>
+                                    <DataTable.Cell>{x.appDni}</DataTable.Cell>
+                                    <DataTable.Cell>{x.appNombre}</DataTable.Cell>                                    
+                                    <DataTable.Cell>{x.appCreacion}</DataTable.Cell>                                    
                                   </DataTable.Row>
                               </>
-                            )}                            
+                                                      
                           </View>                        
                         ))
-                      : null }
+                      : <>
+                        <Text style={styles.msgPermisos}>
+                          No tiene los permisos suficientes
+                        </Text>
+                      </> }
 
                       </DataTable>
                     
                     </ScrollView>
                 </ScrollView>
-
-                <Text style={styles.subTitulo}>TOTAL DE REGISTROS: {count}</Text>                
+                
 
               </>
 
@@ -191,6 +182,9 @@ const styles = StyleSheet.create({
       color: '#000',   
       marginTop: 10, 
     },
+    msgPermisos: {          
+      textAlign: 'center'         
+    }, 
   });
 
-export default Facturaciones
+export default Usuarios

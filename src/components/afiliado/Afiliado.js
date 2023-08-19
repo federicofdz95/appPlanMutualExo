@@ -8,9 +8,9 @@ import { vw, vh, vmin, vmax } from 'react-native-expo-viewport-units';
 import { SafeAreaView } from 'react-native'
 import { ScrollView } from 'react-native'
 import Loading from '../Loading'
+import {API_AFILIADO} from "@env"
 
 
-const urlControlDni = "http://apifdz.somee.com/api/afiliados/";
 
 
 const Afiliado = ({route}) => {
@@ -21,18 +21,31 @@ const Afiliado = ({route}) => {
     const [isLoading, setLoading] = useState(false);
     const [data, setData] = useState([]);
         
-    
-    //console.log(urlControlDni+documento)
-    //console.log(afiliado)
+            
+    getUsers = () => {
+      
+      fetch(API_AFILIADO+documento,{
+        method: 'GET',        
+      }).then(r=>r.json()).then(res=>{
+        if(res){          
 
-    getUsers = async() => {
-                  
-      const resp = await fetch(urlControlDni+documento);
+            //console.log('cont: ' + res.length);
+            setData(res);
+            setLoading(true);
+        }
+      }).catch(err => {
+        console.log('error!: ' + err)
+        ToastAndroid.show("Afiliado inexistente", ToastAndroid.SHORT)
+      });
+
+      /*
+      const resp = await fetch(API_AFILIADO+documento);
       const datos = await resp.json();
-      //console.log([datos.data])
-      setData([datos.data]);
+      console.log(datos.length)
+      setData([datos]);
       setLoading(true);
       //console.log(Array.isArray(data))
+      */
       
     }
 
@@ -46,7 +59,6 @@ const Afiliado = ({route}) => {
 
     <>
     
-
     <SafeAreaView style={styles.mainContainer}>
         
         <View style={styles.mainContainer}>
@@ -77,7 +89,7 @@ const Afiliado = ({route}) => {
                             <DataTable.Title>HASTA</DataTable.Title>
                         </DataTable.Header>
 
-                        {Array.isArray(data) ? data.map((x,i) => {
+                        {data ? data.map((x,i) => {
                           return(
                           <DataTable.Row key={i} style={styles.tableRow}>                              
                               <DataTable.Cell style={styles.texto}><Text>{documento}</Text></DataTable.Cell>

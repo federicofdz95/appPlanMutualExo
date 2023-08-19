@@ -8,6 +8,7 @@ const TopBar = ({data}) => {
   const navigation = useNavigation();
 
   const salir = () => {
+    delete global.tokenMutual;
     ToastAndroid.show('Sesión cerrada ', ToastAndroid.TOP);    
     navigation.navigate('login', {doc: ''});    
   }
