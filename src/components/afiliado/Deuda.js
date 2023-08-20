@@ -10,14 +10,15 @@ import Loading from '../Loading';
 import Env from 'react-native-config';
 import MercadoPagoCheckout from '@blackbox-vision/react-native-mercadopago-px';
 import * as MercadoPagoService from '../mercadopago/mercadopago-service';
-import {API_IMPAGOS} from "@env"
-
-const urlPeriodosImpagos = "http://apifdz.somee.com/api/impagos/";
-
+import {API_IMPAGOS, MP_ACCESS_TOKEN, MP_MAIL, MP_PUBLIC_KEY} from "@env"
+import { Payment } from '@mercadopago/sdk-react';
+import { initMercadoPago } from '@mercadopago/sdk-react';
+initMercadoPago(MP_PUBLIC_KEY);
 
 
 const Deuda = ({route}) => {  
     
+    //console.log(MP_PUBLIC_KEY)
 
     const navigate = useNavigation();    
     const documento = (route.params.dni);
@@ -34,20 +35,25 @@ const Deuda = ({route}) => {
 
     const startCheckout = async () => {
       try {
-        const preferenceId = await MercadoPagoService.getPreferenceId('federicofdzok@gmail.com', {
+        const preferenceId = await getPreferenceId(MP_MAIL, {
           title: 'PAGAR',
           description: 'PAGARR',
           quantity: 1,
           currency_id: 'ARS',
-          unit_price: 10,
+          unit_price: 10.0,
         });
 
-        //publicKey: Env.MP_PUBLIC_KEY,
-        const payment = await MercadoPagoCheckout.createPayment({
-          
-          publicKey: 'TEST-2e9cf438-5ae8-4528-ab19-ad6a3058b32e',
+        console.log({          
+          publicKey: MP_PUBLIC_KEY,
+          preferenceId,
+        })
+
+        const payment = await MercadoPagoCheckout.createPayment({          
+          publicKey: MP_PUBLIC_KEY,
           preferenceId,
         });
+
+        //console.log(payment)
 
         setPaymentResult(payment);
       } catch (err) {
@@ -55,6 +61,86 @@ const Deuda = ({route}) => {
         console.log('Something went wrong', err.message);
       }
     };
+
+    // You should create the preference server-side, not client-side 
+// but we show client-side for the sake of simplicity
+const getPreferenceId = async (payer, ...items) => {
+  
+  
+  const response = await fetch(
+    `https://api.mercadopago.com/checkout/preferences?access_token=${MP_ACCESS_TOKEN}`,
+    {
+      method: 'POST',
+      body: JSON.stringify({
+        items,
+        payer: {
+          email: payer,
+        },
+      }),
+    }
+  );
+
+    const preference = await response.json();
+
+    //console.log('id: ' + preference.id)
+    return preference.id;
+  };
+
+
+  const preferenceId = getPreferenceId(MP_MAIL, {
+    title: 'PAGAR',
+    description: 'PAGARR',
+    quantity: 1,
+    currency_id: 'ARS',
+    unit_price: 10.0,
+  });
+    
+    const initialization = {
+      amount: 100,
+      preferenceId,
+    };
+    const customization = {
+      paymentMethods: {
+        ticket: "all",
+        creditCard: "all",
+        debitCard: "all",
+        mercadoPago: "all",
+      },
+    };
+    const onSubmit = async (
+      { selectedPaymentMethod, formData }
+    ) => {
+      // callback llamado al hacer clic en el botón enviar datos
+      return new Promise((resolve, reject) => {
+        fetch("/process_payment", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        })
+          .then((response) => response.json())
+          .then((response) => {
+            // recibir el resultado del pago
+            resolve();
+          })
+          .catch((error) => {
+            // manejar la respuesta de error al intentar crear el pago
+            reject();
+          });
+      });
+    };
+    const onError = async (error) => {
+      // callback llamado para todos los casos de error de Brick
+      console.log(error);
+    };
+    const onReady = async () => {
+      /*
+        Callback llamado cuando el Brick está listo.
+        Aquí puede ocultar cargamentos de su sitio, por ejemplo.
+      */
+    };
+ 
 
 
     getFacturacion = () => {
@@ -76,7 +162,7 @@ const Deuda = ({route}) => {
         }
       }).catch(err => {
         console.log('error!: ' + err)
-        ToastAndroid.show("Afiliado inexistente", ToastAndroid.SHORT)
+        //ToastAndroid.show("Afiliado inexistente", ToastAndroid.SHORT)
       });
 
       
@@ -151,9 +237,28 @@ const Deuda = ({route}) => {
                               </View>                        
                             ))}
 
-                          </DataTable>
+                          </DataTable>                          
                         
                         </ScrollView>
+
+                        <TouchableOpacity onPress={startCheckout}>
+                          <Text style={styles.text}>Start Payment</Text>
+                        </TouchableOpacity>
+                        
+                        <Text style={styles.text}>Payment: {JSON.stringify(paymentResult)}</Text>      
+                        
+                        {/*
+                        <View>
+                          <Payment
+                            initialization={initialization}
+                            customization={customization}
+                            onSubmit={onSubmit}
+                            onReady={onReady}
+                            onError={onError}
+                          />
+                        </View>
+                        */}
+
                     </ScrollView>
                   </>
                 )}
@@ -173,27 +278,6 @@ const Deuda = ({route}) => {
   )
 }
 
-
-// You should create the preference server-side, not client-side 
-// but we show client-side for the sake of simplicity
-export const getPreferenceId = async (payer, ...items) => {
-  const response = await fetch(
-    `https://api.mercadopago.com/checkout/preferences?access_token=${Env.MP_ACCESS_TOKEN}`,
-    {
-      method: 'POST',
-      body: JSON.stringify({
-        items,
-        payer: {
-          email: payer,
-        },
-      }),
-    }
-  );
-
-  const preference = await response.json();
-
-  return preference.id;
-};
 
 
 const styles = StyleSheet.create({

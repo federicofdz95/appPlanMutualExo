@@ -2,13 +2,14 @@ import React, { useEffect, useState } from 'react'
 import { ToastAndroid, View } from 'react-native'
 import { StyleSheet } from 'react-native'
 import { Text } from 'react-native'
-import { Appbar, DataTable } from 'react-native-paper'
+import { DataTable } from 'react-native-paper'
 import axios from 'axios'
 import { vw, vh, vmin, vmax } from 'react-native-expo-viewport-units';
 import { SafeAreaView } from 'react-native'
 import { ScrollView } from 'react-native'
 import Loading from '../Loading'
 import {API_AFILIADO} from "@env"
+import { Row, Table } from 'react-native-table-component'
 
 
 
@@ -17,9 +18,15 @@ const Afiliado = ({route}) => {
 
     const documento = (route.params.dni);
     const afiliado = (route.params.nombre + ' ' + route.params.apellido);
-
     const [isLoading, setLoading] = useState(false);
+
+    const [plan, setPlan] = useState('');
+    const [desde, setDesde] = useState('');
+    const [hasta, setHasta] = useState('');
+    const [cont, setCont] = useState('');
+    
     const [data, setData] = useState([]);
+
         
             
     getUsers = () => {
@@ -29,7 +36,13 @@ const Afiliado = ({route}) => {
       }).then(r=>r.json()).then(res=>{
         if(res){          
 
-            //console.log('cont: ' + res.length);
+            //console.log('cont: ' + JSON.stringify(res));
+            setPlan(res[0].codPlan);
+            setDesde(res[0].desde);            
+            res[0].hasta == null || res[0].hasta == '' ? setHasta('activo') : setHasta(res[0].hasta);
+            //console.log(hasta);
+
+            setCont(res.length);
             setData(res);
             setLoading(true);
         }
@@ -62,59 +75,71 @@ const Afiliado = ({route}) => {
     <SafeAreaView style={styles.mainContainer}>
         
         <View style={styles.mainContainer}>
-
+        
           {!isLoading ? 
               (              
                 <Loading/>
               ):(
 
               <>
-
                 
+                <ScrollView style={styles.scrollView}>                                     
 
-                <ScrollView style={styles.scrollView}>
+                        {data ? 
+                          <>
 
-                    <Text style={{
-                      textAlign:'center',
-                      marginTop: 10,
-                    }}>HISTORIAL</Text>
-                    
-                    
+                            
+                            <DataTable style={styles.table}>
 
-                    <DataTable style={styles.table}>                        
-                        <DataTable.Header style={styles.tableHeader}>                            
-                            <DataTable.Title>DNI</DataTable.Title>
-                            <DataTable.Title>PLAN</DataTable.Title>
-                            <DataTable.Title>DESDE</DataTable.Title>
-                            <DataTable.Title>HASTA</DataTable.Title>
-                        </DataTable.Header>
+                              <DataTable.Header style={styles.tableHeader}>                            
+                                  <DataTable.Title>DNI</DataTable.Title>
+                                  <DataTable.Title style={styles.tableRow}>
+                                    <Text style={styles.texto}>{documento}</Text>
+                                  </DataTable.Title>
+                              </DataTable.Header>
 
-                        {data ? data.map((x,i) => {
-                          return(
-                          <DataTable.Row key={i} style={styles.tableRow}>                              
-                              <DataTable.Cell style={styles.texto}><Text>{documento}</Text></DataTable.Cell>
-                              <DataTable.Cell style={styles.texto}><Text>{x.codPlan}</Text></DataTable.Cell>
-                              <DataTable.Cell>{x.desde}</DataTable.Cell>
-                              {x.hasta == '' || x.hasta == null ?
-                                (
-                                  <>
-                                    <DataTable.Cell style={{
-                                      backgroundColor: '#b0f2c2',                                      
-                                    }}>
-                                      activo
-                                    </DataTable.Cell>
-                                  </>
-                                ):(
-                                  <>
-                                    <DataTable.Cell>{x.hasta}</DataTable.Cell>
-                                  </>
-                              )}
-                              
-                          </DataTable.Row>
-                        )})
+                              <DataTable.Header style={styles.tableHeader}>                            
+                                  <DataTable.Title>PLAN</DataTable.Title>
+                                  <DataTable.Title style={styles.tableRow}>
+                                    <Text style={styles.texto}>{plan}</Text>
+                                  </DataTable.Title>
+                              </DataTable.Header>
+
+
+                              <DataTable.Header style={styles.tableHeader}>                            
+                                  <DataTable.Title>DESDE</DataTable.Title>
+                                  <DataTable.Title style={styles.tableRow}>
+                                    <Text style={styles.texto}>{desde}</Text>
+                                  </DataTable.Title>
+                              </DataTable.Header>
+
+
+                              <DataTable.Header style={styles.tableHeader}>                            
+                                  <DataTable.Title>HASTA</DataTable.Title>
+                                  {hasta == 'activo' ?
+                                    (
+                                      <>                                        
+                                        <DataTable.Title style={{backgroundColor: '#b0f2c2'}}>
+                                          <Text style={styles.texto}>activo</Text>
+                                        </DataTable.Title>
+                                      </>
+                                    ):(
+                                      <>
+                                        <DataTable.Title style={styles.tableRow}>
+                                          <Text>{hasta}</Text>
+                                        </DataTable.Title>
+                                      </>
+                                  )}                                  
+                                  
+                              </DataTable.Header>
+
+                            </DataTable>
+
+                          </>
+                        
                       : null}
                               
-                    </DataTable>
+                    
               
               </ScrollView>
 
@@ -138,7 +163,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f1f1f1',         
+    backgroundColor: '#f1f1f1',    
   },    
   scrollView: {      
     marginHorizontal: 10,      
@@ -149,7 +174,8 @@ const styles = StyleSheet.create({
     table: {      
       width: vw(100) ,
       //height: vh(100),
-      marginTop: 20,      
+      marginTop: 20,
+      justifyContent: 'center'
     },  
     tableHeader: {                
       textAlign: 'center',
@@ -157,10 +183,12 @@ const styles = StyleSheet.create({
     },
     tableRow: {                
         backgroundColor: '#FFF',         
-        height: vw(18), 
+        //height: vw(10), 
+        textAlign:'center',
     },
     texto: {
       textAlign:'center',      
+      fontSize: 16
     }
   });
 
