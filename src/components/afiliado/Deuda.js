@@ -1,19 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import { Text, ScrollView, Button, View, StyleSheet, TouchableOpacity, Alert } from 'react-native'
 import { Appbar, DataTable, IconButton, MD3Colors } from 'react-native-paper'
-import axios from 'axios'
-import LoginSVG from '../LoginSVG'
 import { vw, vh, vmin, vmax } from 'react-native-expo-viewport-units';
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useNavigation } from '@react-navigation/native';
 import Loading from '../Loading';
-import Env from 'react-native-config';
-import MercadoPagoCheckout from '@blackbox-vision/react-native-mercadopago-px';
-import * as MercadoPagoService from '../mercadopago/mercadopago-service';
 import {API_IMPAGOS, MP_ACCESS_TOKEN, MP_MAIL, MP_PUBLIC_KEY} from "@env"
-import { Payment } from '@mercadopago/sdk-react';
-import { initMercadoPago } from '@mercadopago/sdk-react';
-initMercadoPago(MP_PUBLIC_KEY);
+
+
 
 
 const Deuda = ({route}) => {  
@@ -33,115 +27,7 @@ const Deuda = ({route}) => {
 
     const token = global.tokenMutual;
 
-    const startCheckout = async () => {
-      try {
-        const preferenceId = await getPreferenceId(MP_MAIL, {
-          title: 'PAGAR',
-          description: 'PAGARR',
-          quantity: 1,
-          currency_id: 'ARS',
-          unit_price: 10.0,
-        });
-
-        console.log({          
-          publicKey: MP_PUBLIC_KEY,
-          preferenceId,
-        })
-
-        const payment = await MercadoPagoCheckout.createPayment({          
-          publicKey: MP_PUBLIC_KEY,
-          preferenceId,
-        });
-
-        //console.log(payment)
-
-        setPaymentResult(payment);
-      } catch (err) {
-        alert('Something went wrong', err.message);
-        console.log('Something went wrong', err.message);
-      }
-    };
-
-    // You should create the preference server-side, not client-side 
-// but we show client-side for the sake of simplicity
-const getPreferenceId = async (payer, ...items) => {
-  
-  
-  const response = await fetch(
-    `https://api.mercadopago.com/checkout/preferences?access_token=${MP_ACCESS_TOKEN}`,
-    {
-      method: 'POST',
-      body: JSON.stringify({
-        items,
-        payer: {
-          email: payer,
-        },
-      }),
-    }
-  );
-
-    const preference = await response.json();
-
-    //console.log('id: ' + preference.id)
-    return preference.id;
-  };
-
-
-  const preferenceId = getPreferenceId(MP_MAIL, {
-    title: 'PAGAR',
-    description: 'PAGARR',
-    quantity: 1,
-    currency_id: 'ARS',
-    unit_price: 10.0,
-  });
     
-    const initialization = {
-      amount: 100,
-      preferenceId,
-    };
-    const customization = {
-      paymentMethods: {
-        ticket: "all",
-        creditCard: "all",
-        debitCard: "all",
-        mercadoPago: "all",
-      },
-    };
-    const onSubmit = async (
-      { selectedPaymentMethod, formData }
-    ) => {
-      // callback llamado al hacer clic en el botón enviar datos
-      return new Promise((resolve, reject) => {
-        fetch("/process_payment", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-        })
-          .then((response) => response.json())
-          .then((response) => {
-            // recibir el resultado del pago
-            resolve();
-          })
-          .catch((error) => {
-            // manejar la respuesta de error al intentar crear el pago
-            reject();
-          });
-      });
-    };
-    const onError = async (error) => {
-      // callback llamado para todos los casos de error de Brick
-      console.log(error);
-    };
-    const onReady = async () => {
-      /*
-        Callback llamado cuando el Brick está listo.
-        Aquí puede ocultar cargamentos de su sitio, por ejemplo.
-      */
-    };
- 
-
 
     getFacturacion = () => {
 
@@ -241,12 +127,8 @@ const getPreferenceId = async (payer, ...items) => {
                         
                         </ScrollView>
 
-                        <TouchableOpacity onPress={startCheckout}>
-                          <Text style={styles.text}>Start Payment</Text>
-                        </TouchableOpacity>
-                        
-                        <Text style={styles.text}>Payment: {JSON.stringify(paymentResult)}</Text>      
-                        
+                       
+
                         {/*
                         <View>
                           <Payment
